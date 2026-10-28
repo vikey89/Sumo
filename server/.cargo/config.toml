@@ -1,0 +1,4 @@
+# ts-rs writes the wire types for the arena next to the client code, with plain numbers.
+[env]
+TS_RS_EXPORT_DIR = { value = "../src/generated", relative = true }
+TS_RS_LARGE_INT = "number"
