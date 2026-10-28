@@ -79,7 +79,7 @@ target() {
 latest() {
   url=$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$1/releases/latest") || fail "could not find a release of $1 on GitHub"
   tag=${url##*/}
-  [ "$tag" != latest ] && [ -n "$tag" ] || fail "no release of $1 found"
+  if [ -z "$tag" ] || [ "$tag" = latest ]; then fail "no release of $1 found"; fi
   echo "$tag"
 }
 
