@@ -17,7 +17,7 @@
     "build:cli": "npm run build && cargo build --release --manifest-path server/Cargo.toml"
   },
   "dependencies": {
-    "@babylonjs/core": "^8.0.0"
+    "@babylonjs/core": "^9.32.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
