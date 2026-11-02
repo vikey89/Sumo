@@ -20,7 +20,7 @@ jobs:
           crate=$(sed -n 's/^version = "\(.*\)"/\1/p' server/Cargo.toml | head -1)
           test "v$crate" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME, crate $crate"; exit 1; }
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
