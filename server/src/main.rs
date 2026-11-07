@@ -353,10 +353,13 @@ async fn main() -> ExitCode {
         Action::Open => open(&options, &url),
         Action::Serve => serve(&options, &url).await,
         Action::Stop => stop(options.port),
-        Action::Top => {
-            top::run().await;
-            ExitCode::SUCCESS
-        }
+        Action::Top => match top::run().await {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => {
+                eprintln!("sumo: {error}");
+                ExitCode::FAILURE
+            }
+        },
         Action::Status => match probe(options.port) {
             Port::Sumo(pid) => {
                 let pid = pid.map(|pid| format!(" (pid {pid})")).unwrap_or_default();

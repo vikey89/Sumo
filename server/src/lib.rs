@@ -38,7 +38,7 @@ impl Engine {
 /// Start sampling and serving on `listener` in the background.
 pub async fn serve(listener: TcpListener) -> std::io::Result<Engine> {
     let guard = Arc::new(guard::Guard::new(listener.local_addr()?.port()));
-    let mut system = System::new();
+    let mut system = sampler::open()?;
     sampler::refresh(&mut system);
     tokio::time::sleep(MINIMUM_CPU_UPDATE_INTERVAL).await;
     sampler::refresh(&mut system);

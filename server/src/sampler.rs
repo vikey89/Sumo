@@ -40,11 +40,11 @@ pub struct Sampler(System);
 
 impl Sampler {
     /// Ready once a first CPU reading has settled.
-    pub async fn new() -> Self {
-        let mut system = System::new();
+    pub async fn new() -> std::io::Result<Self> {
+        let mut system = open()?;
         refresh(&mut system);
         tokio::time::sleep(MINIMUM_CPU_UPDATE_INTERVAL).await;
-        Self(system)
+        Ok(Self(system))
     }
 
     /// A snapshot in the same JSON the arena receives.
@@ -82,6 +82,12 @@ pub(crate) async fn sample(
             break;
         }
     }
+}
+
+/// A handle on this Mac's processes; fails only where sysinfo can't read them.
+pub(crate) fn open() -> std::io::Result<System> {
+    System::new()
+        .map_err(|error| std::io::Error::other(format!("cannot read the processes: {error}")))
 }
 
 pub(crate) fn refresh(system: &mut System) {

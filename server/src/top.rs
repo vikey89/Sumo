@@ -212,12 +212,12 @@ fn render(
 }
 
 /// Live in a terminal; a single snapshot when piped.
-pub async fn run() {
+pub async fn run() -> std::io::Result<()> {
     let live = std::io::stdout().is_terminal();
     let style = Style {
         color: live && std::env::var_os("NO_COLOR").is_none(),
     };
-    let mut sampler = sumo::Sampler::new().await;
+    let mut sampler = sumo::Sampler::new().await?;
     let read =
         |sampler: &mut sumo::Sampler| serde_json::from_str::<Snapshot>(&sampler.sample()).ok();
 
@@ -230,7 +230,7 @@ pub async fn run() {
                 render(&snapshot, None, false, false, &style).join("\n")
             );
         }
-        return;
+        return Ok(());
     }
 
     // Alternate screen with a hidden cursor and single-key input, all restored on the way out.
@@ -265,6 +265,7 @@ pub async fn run() {
     let _ = write!(stdout, "\x1b[?25h\x1b[?1049l");
     let _ = stdout.flush();
     drop(raw);
+    Ok(())
 }
 
 /// Keys read one at a time from stdin; closes when stdin does.
