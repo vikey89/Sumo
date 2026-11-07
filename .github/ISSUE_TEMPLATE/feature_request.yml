@@ -1,0 +1,11 @@
+name: Idea
+description: A new wrestler move, a game mechanic, or anything that would make SUMO better.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What would you like SUMO to do, and why?
+    validations:
+      required: true

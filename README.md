@@ -1,5 +1,9 @@
 # 相撲 SUMO
 
+[![CI](https://github.com/vikey89/Sumo/actions/workflows/ci.yml/badge.svg)](https://github.com/vikey89/Sumo/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/vikey89/Sumo)](https://github.com/vikey89/Sumo/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 ![A bout in the SUMO arena: Google Chrome faces claude, the prediction pays off and the chanko coins fly](docs/assets/demo.gif)
 
 Your Mac's processes and apps become sumo wrestlers in a 3D arena: the more memory they
@@ -14,7 +18,7 @@ where each app's first bout of the day counts towards kachi-koshi and the yūsh�
 
 ## Install
 
-macOS only (Apple Silicon and Intel).
+macOS 11 or later, on Apple Silicon or Intel.
 
 ```sh
 brew install vikey89/tap/sumo
@@ -47,10 +51,26 @@ after you close the last arena tab. Options: `--port 4000` (or `SUMO_PORT=4000`)
 `--no-open` to skip opening the browser, `--no-notify` to skip notifications when memory
 runs low. Logs from the background engine go to `~/Library/Logs/sumo.log`.
 
-The arena only listens on `127.0.0.1`: other web pages can't read your processes or quit
-apps.
+## Safety & privacy
+
+SUMO can quit apps, so it is careful about it:
+
+- **Nothing quits without you.** Pushing a wrestler out of the ring always asks for
+  confirmation first. Apps get a polite `quit`, so they can ask to save your work; other
+  processes get `SIGTERM`, never `SIGKILL`.
+- **Some wrestlers can't be pushed.** System processes, other users' processes and SUMO's
+  own process tree are locked.
+- **Local only.** The engine listens on `127.0.0.1` and refuses requests from any other web
+  page or host name, so a site you visit can't read your processes or quit apps.
+- **No telemetry.** SUMO collects nothing. Full command lines never leave the engine: the
+  arena only gets an app's name, its tool and its project folder name. The one request to
+  the outside is the arena's fonts, from Google Fonts.
+
+Found a security problem? Please report it privately, see [SECURITY.md](SECURITY.md).
 
 ## Development
+
+Needs Node 22 and Rust 1.95 or later.
 
 ```sh
 npm install
@@ -62,8 +82,10 @@ npm run build:cli   # binary with the arena embedded: server/target/release/sumo
 
 1. Bump `version` in `server/Cargo.toml`, then create and push the tag: `git tag v0.2.0 && git push --tags`.
 2. The GitHub Action builds for Apple Silicon and Intel and publishes the release.
-3. If the `HOMEBREW_TAP_TOKEN` secret is set (a token with write access to
-   `homebrew-tap`), it also updates `Formula/sumo.rb` in the tap.
+3. If the `HOMEBREW_TAP_TOKEN` secret is set (a fine-grained token with *Contents: read and
+   write* on `homebrew-tap`), it also updates `Formula/sumo.rb` in the tap.
+4. If a step fails, fix it and re-run the job: an existing release is kept as it is and the
+   formula is written from its `checksums.txt`.
 
 ## License
 
