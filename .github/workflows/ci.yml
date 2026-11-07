@@ -64,7 +64,7 @@ jobs:
       - run: npm run e2e
       - name: The curl installer installs, checks the SHA-256 and uninstalls
         run: packaging/test-install.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
