@@ -40,7 +40,14 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" sumo-*.tar.gz checksums.txt --generate-notes
+        # On a re-run the release is already out: keep its archives, whose checksums people
+        # have already verified, and take its checksums.txt for the formula below.
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release download "$GITHUB_REF_NAME" -p checksums.txt --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" sumo-*.tar.gz checksums.txt --generate-notes
+          fi
 
       - name: Update the Homebrew tap
         env:
@@ -50,12 +57,13 @@ jobs:
           version=${GITHUB_REF_NAME#v}
           arm=$(awk '/aarch64/ {print $1}' checksums.txt)
           intel=$(awk '/x86_64/ {print $1}' checksums.txt)
-          git clone "https://x-access-token:$TAP_TOKEN@github.com/${GITHUB_REPOSITORY_OWNER}/homebrew-tap.git" tap
+          # A token pasted with a trailing newline would break the URL.
+          token=$(printf %s "$TAP_TOKEN" | tr -d '[:space:]')
+          git clone "https://x-access-token:$token@github.com/${GITHUB_REPOSITORY_OWNER}/homebrew-tap.git" tap
           mkdir -p tap/Formula
           SUMO_REPO=$GITHUB_REPOSITORY packaging/homebrew/formula.sh "$version" "$arm" "$intel" > tap/Formula/sumo.rb
           cd tap
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/sumo.rb
-          git commit -m "sumo $version"
-          git push
+          git diff --cached --quiet || { git commit -m "sumo $version" && git push; }
