@@ -27,7 +27,7 @@ jobs:
 
   engine:
     # The engine reads macOS processes, so it is built and tested where it runs.
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,7 +47,7 @@ jobs:
 
   e2e:
     # Smoke test of the real engine and arena in Chromium; the engine reads macOS processes.
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
