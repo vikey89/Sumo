@@ -16,7 +16,9 @@ export SUMO_VERSION="v$version" SUMO_DOWNLOAD_URL="file://$work/release" SUMO_IN
 sh install.sh
 test "$("$work/bin/sumo" --version)" = "sumo $version"
 
-sed 's/^./0/' "$work/release/checksums.txt" > "$work/tampered" && mv "$work/tampered" "$work/release/checksums.txt"
+# Flip the first digit of every checksum, whatever it was.
+awk '{ print (substr($0, 1, 1) == "0" ? "1" : "0") substr($0, 2) }' "$work/release/checksums.txt" > "$work/tampered"
+mv "$work/tampered" "$work/release/checksums.txt"
 if SUMO_INSTALL_DIR="$work/other" sh install.sh 2>/dev/null; then echo "installed despite a bad checksum" >&2; exit 1; fi
 test ! -e "$work/other/sumo"
 
